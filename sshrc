@@ -37,6 +37,9 @@ transfer() {
 connect() {
   local CMD_DIR="$(abs_dirname $0)"
   ${SSH_CMD} -t "${SSH_REMOTE}" ${SSH_OPTS} "\
+    base64_decode() {
+      echo | base64 -d 2>/dev/null 1>/dev/null && base64 -d || base64 -D
+    }
     export DANYRC_NAME=\"${DANYRC_NAME}\"
     export DANYRCD_NAME=\"${DANYRCD_NAME}\"
     export ANYRC_ROOT=\"\$(mktemp -d /tmp/anyrc.XXXXXX)\"
@@ -46,9 +49,9 @@ connect() {
     export PATH=\"\${ANYRC_ROOT}:\${PATH}\"
     trap \"rm -rf \${ANYRC_ROOT}; exit\" 0
     mkdir -p \${ANYRC_DANYRCD}
-    echo '"$(cat "${ANYRC_DANYRC}" | base64)"' | tr -s ' ' '\n' | base64 -d > \${ANYRC_DANYRC}
-    echo '"$(tar czf - -h -C ${CMD_DIR} ${ANYRC_CMD} ${ANYRC_CMDS[@]} | base64)"' | tr -s ' ' $'\n' | base64 -d | tar mxzf - -C \${ANYRC_ROOT}
-    echo '"$(tar czf - -h -C ${DANYRCD_DIR} ${DANYRCD_BASE} | base64)"' | tr -s ' ' '\n' | base64 -d | tar mxzf - -C \${ANYRC_ROOT}
+    echo '"$(cat "${ANYRC_DANYRC}" | base64)"' | tr -s ' ' '\n' | base64_decode > \${ANYRC_DANYRC}
+    echo '"$(tar czf - -h -C ${CMD_DIR} ${ANYRC_CMD} ${ANYRC_CMDS[@]} | base64)"' | tr -s ' ' $'\n' | base64_decode | tar mxzf - -C \${ANYRC_ROOT}
+    echo '"$(tar czf - -h -C ${DANYRCD_DIR} ${DANYRCD_BASE} | base64)"' | tr -s ' ' '\n' | base64_decode | tar mxzf - -C \${ANYRC_ROOT}
     source \${ANYRC_DANYRC}
     if [ \"\${SHELL##*/}\" = 'bash' ]; then
       bash --rcfile \${ANYRC_DANYRC};
