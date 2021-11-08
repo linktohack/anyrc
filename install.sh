@@ -1,5 +1,6 @@
 #!/bin/bash -eu
 
+: ${REPO:='https://github.com/amaya382/anyrc'}
 : ${VERSION:='0.1.0'}
 : ${DIR:='/usr/local/bin'}
 [ "$(ls -ld ${DIR} | cut -d' ' -f3)" != "${USER}" ] && SUDO='sudo' || SUDO=''
@@ -8,7 +9,7 @@ for cmd in dockrc kuberc dockerrunrc dockerexecrc kubectlexecrc; do
   ${SUDO} rm "${DIR}/${cmd}" &> /dev/null # Remove old commands
 done
 for cmd in anyrc sshrc dockerrc kubectlrc surc; do
-  ${SUDO} curl -sSL "https://github.com/amaya382/anyrc/raw/${VERSION}/${cmd}" -o "${DIR}/${cmd}"
+  ${SUDO} curl -sSL "${REPO}/raw/${VERSION}/${cmd}" -o "${DIR}/${cmd}"
   ${SUDO} chmod +x "${DIR}/${cmd}"
 done
 
@@ -23,7 +24,7 @@ fi
 
 if [ -z "${SKIP_DANYRC:+_}" ]; then
   echo "Installing ${HOME}/.anyrc ..."
-  curl -sSL https://github.com/amaya382/anyrc/raw/${VERSION}/example/.anyrc \
+  curl -sSL "${REPO}/raw/${VERSION}/example/.anyrc" \
     -o ~/.anyrc
 fi
 echo "Creating ${HOME}/.anyrc.d ..."

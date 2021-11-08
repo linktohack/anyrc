@@ -23,6 +23,7 @@ Just use `*rc` commands instead of original commands
 ### Setup/Upgrade
 ```sh
 # If you want to install the latest version, change version to master in the url and set VERSION
+# REPO: anyrc fork (default: same as install script fork)
 # VERSION: anyrc version (default: same as install script version)
 # DIR: Where to install (default: /usr/local/bin)
 # FORCE: If defined, override .anyrc (default: undefined)
