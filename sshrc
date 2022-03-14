@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-ANYRC_ENV='ssh'
+export ANYRC_ENV='ssh'
 
 init() {
   SSH_CMD="${ANYRC_SSH_CMD:-ssh}"
@@ -22,7 +22,7 @@ init() {
     shift
   done
   if [ -z "${SSH_REMOTE:+_}" ]; then
-    ${SSH_CMD} ${SSH_OPTS}; exit 1;
+    ${SSH_CMD} "${SSH_OPTS[@]}"; exit 1;
   fi
 }
 
@@ -35,26 +35,30 @@ transfer() {
 }
 
 connect() {
-  local CMD_DIR="$(abs_dirname $0)"
+  local CMD_DIR="$(abs_dirname "$0")"
   ${SSH_CMD} -t "${SSH_REMOTE}" ${SSH_OPTS} "\
-    base64_decode() {
-      echo | base64 -d 2>/dev/null 1>/dev/null && base64 -d || base64 -D
-    }
+    base64_decode() { echo | base64 -d 2>/dev/null 1>/dev/null && base64 -d || base64 -D }
+
     export ANYRC_NAME=\"${ANYRC_NAME}\"
     export ANYRCD_NAME=\"${ANYRCD_NAME}\"
     export ANYRC_ROOT=\"\$(mktemp -d /tmp/anyrc.XXXXXX)\"
     export ANYRC_ANYRC=\"\${ANYRC_ROOT}/\${ANYRC_NAME}\"
     export ANYRC_ANYRCD=\"\${ANYRC_ROOT}/\${ANYRCD_NAME}\"
     export ANYRC_HOME=\"\${ANYRC_ANYRCD}\"
+
     export PATH=\"\${ANYRC_ROOT}:\${PATH}\"
+
     trap \"rm -rf \${ANYRC_ROOT}; exit\" 0
     mkdir -p \${ANYRC_ANYRCD}
-    echo '"$(cat "${ANYRC_ANYRC}" | base64)"' | tr -s ' ' '\n' | base64_decode > \${ANYRC_ANYRC}
-    echo '"$(tar czf - -h -C ${CMD_DIR} ${ANYRC_CMD} ${ANYRC_CMDS[@]} | base64)"' | tr -s ' ' $'\n' | base64_decode | tar mxzf - -C \${ANYRC_ROOT}
-    echo '"$(tar czf - -h -C ${ANYRCD_DIR} ${ANYRCD_BASE} | base64)"' | tr -s ' ' '\n' | base64_decode | tar mxzf - -C \${ANYRC_ROOT}
-    source \${ANYRC_ANYRC}
+
+    echo '$(base64 < "${ANYRC_ANYRC}")' | tr -s ' ' '\n' | base64_decode > \${ANYRC_ANYRC}
+    echo '$(tar czf - -h -C "${CMD_DIR}" "${ANYRC_CMD}" "${ANYRC_CMDS[@]}" | base64)' | tr -s ' ' $'\n' | base64_decode | tar mxzf - -C \"\${ANYRC_ROOT}\"
+    echo '$(tar czf - -h -C "${ANYRCD_DIR}" "${ANYRCD_BASE}" | base64)' | tr -s ' ' '\n' | base64_decode | tar mxzf - -C \"\${ANYRC_ROOT}\"
+
     if [ \"\${SHELL##*/}\" = 'bash' ]; then
-      bash --rcfile \${ANYRC_ANYRC};
+      [[ -e \${ANYRC_HOME}/.bashrc ]] && bash --rcfile \${ANYRC_HOME}/.bashrc || bash --rcfile \${ANYRC_ANYRC}
+    elif [ \"\${SHELL##*/}\" = 'zsh' ]; then
+      [[ -e \${ANYRC_HOME}/.zshrc ]] && ZDOTDIR=\"\${ANYRC_HOME}\" zsh || ln -sf \${ANYRC_ANYRC} \${ANYRC_HOME}/.zshrc && ZDOTDIR=\"\${ANYRC_HOME}\" zsh
     else
       \${SHELL};
     fi"
