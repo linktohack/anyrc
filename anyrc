@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # Const vals
-DANYRC_NAME='.anyrc'
-DANYRCD_NAME='.anyrc.d'
+ANYRC_NAME='.anyrc'
+ANYRCD_NAME='.anyrc.d'
 
 ANYRC_CMD='anyrc'
 ANYRC_CMD_SSH='sshrc'
@@ -19,35 +19,35 @@ ANYRC_CMDS=( \
 
 
 # Funcs
-set_danyrc() {
+set_anyrc() {
   # .anyrc on local
-  if [ -z "${ANYRC_DANYRC:+_}" ]; then
-    if [ -f "${HOME}/${DANYRC_NAME}" ]; then # Home dir
-      ANYRC_DANYRC="${HOME}/${DANYRC_NAME}"
-    elif [ -f "$(pwd)/${DANYRC_NAME}" ]; then # Current dir
-      ANYRC_DANYRC="$(pwd)/${DANYRC_NAME}"
+  if [ -z "${ANYRC_ANYRC:+_}" ]; then
+    if [ -f "${HOME}/${ANYRC_NAME}" ]; then # Home dir
+      ANYRC_ANYRC="${HOME}/${ANYRC_NAME}"
+    elif [ -f "$(pwd)/${ANYRC_NAME}" ]; then # Current dir
+      ANYRC_ANYRC="$(pwd)/${ANYRC_NAME}"
     else
-      echo >&2 "${DANYRC_NAME} not found"
+      echo >&2 "${ANYRC_NAME} not found"
       exit 1
     fi
   fi
 }
 
-set_danyrcd() {
+set_anyrcd() {
   # .anyrc.d on local
-  if [ -z "${ANYRC_DANYRCD:+_}" ]; then
-    if [ -d "${HOME}/${DANYRCD_NAME}" ]; then # Home dir
-      ANYRC_DANYRCD="${HOME}/${DANYRCD_NAME}"
-    elif [ -d "$(pwd)/${DANYRCD_NAME}" ]; then # Current dir
-      ANYRC_DANYRCD="$(pwd)/${DANYRCD_NAME}"
+  if [ -z "${ANYRC_ANYRCD:+_}" ]; then
+    if [ -d "${HOME}/${ANYRCD_NAME}" ]; then # Home dir
+      ANYRC_ANYRCD="${HOME}/${ANYRCD_NAME}"
+    elif [ -d "$(pwd)/${ANYRCD_NAME}" ]; then # Current dir
+      ANYRC_ANYRCD="$(pwd)/${ANYRCD_NAME}"
     else
-      echo >&2 "${DANYRCD_NAME} not found"
+      echo >&2 "${ANYRCD_NAME} not found"
       exit 1
     fi
   fi
 
-  DANYRCD_BASE="${ANYRC_DANYRCD##*/}"
-  DANYRCD_DIR="${ANYRC_DANYRCD%/*}"
+  ANYRCD_BASE="${ANYRC_ANYRCD##*/}"
+  ANYRCD_DIR="${ANYRC_ANYRCD%/*}"
 }
 
 abs_dirname() {
@@ -69,8 +69,8 @@ abs_dirname() {
 # Main
 init "$@" # (Inherit from *rc)
 
-set_danyrc
-set_danyrcd
+set_anyrc
+set_anyrcd
 
 mk_tmp_dir # (Inherit from *rc)
 

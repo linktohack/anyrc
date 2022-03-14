@@ -76,11 +76,11 @@ transfer() {
   case "${K8S_SUBCMD}" in
     exec )
       # Transfer .anyrc
-      kubectl cp ${K8S_GLOBAL_OPTS} ${K8S_CONTAINER_OPTS} "$(readlink -f ${ANYRC_DANYRC})" "${K8S_POD}:${TMP_DIR}/${DANYRC_NAME}"
+      kubectl cp ${K8S_GLOBAL_OPTS} ${K8S_CONTAINER_OPTS} "$(readlink -f ${ANYRC_ANYRC})" "${K8S_POD}:${TMP_DIR}/${ANYRC_NAME}"
 
       if [ ! -z "${ANYRC_K8S_WO_TAR:+_}" ] || [ ! -z "${ANYRC_WO_TAR:+_}" ]; then
         # Transfer .anyrc.d
-        kubectl cp ${K8S_GLOBAL_OPTS} ${K8S_CONTAINER_OPTS} "$(readlink -f ${ANYRC_DANYRCD})" "${K8S_POD}:${TMP_DIR}/${DANYRCD_NAME}"
+        kubectl cp ${K8S_GLOBAL_OPTS} ${K8S_CONTAINER_OPTS} "$(readlink -f ${ANYRC_ANYRCD})" "${K8S_POD}:${TMP_DIR}/${ANYRCD_NAME}"
 
         # Transfer *rc
         local CMD_DIR="$(abs_dirname $0)"
@@ -91,7 +91,7 @@ transfer() {
         done
       else
         # Transfer .anyrc.d
-        tar cz -h -C "${DANYRCD_DIR}" "${DANYRCD_BASE}" \
+        tar cz -h -C "${ANYRCD_DIR}" "${ANYRCD_BASE}" \
         | kubectl exec -i ${K8S_GLOBAL_OPTS} ${K8S_CONTAINER_OPTS} ${K8S_POD} -- tar xz -C "${TMP_DIR}"
 
         # Transfer *rc
@@ -113,18 +113,18 @@ connect() {
     exec )
       kubectl exec ${K8S_GLOBAL_OPTS} ${K8S_CONTAINER_OPTS} ${K8S_EXEC_OPTS} "${K8S_POD}" \
         -- "${REMOTE_SHELL}" -c "
-          export DANYRC_NAME=\"${DANYRC_NAME}\"
-          export DANYRCD_NAME=\"${DANYRCD_NAME}\"
+          export ANYRC_NAME=\"${ANYRC_NAME}\"
+          export ANYRCD_NAME=\"${ANYRCD_NAME}\"
           export ANYRC_ROOT=\"${TMP_DIR}\"
-          export ANYRC_DANYRC=\"\${ANYRC_ROOT}/\${DANYRC_NAME}\"
-          export ANYRC_DANYRCD=\"\${ANYRC_ROOT}/\${DANYRCD_NAME}\"
-          export ANYRC_HOME=\"\${ANYRC_DANYRCD}\"
+          export ANYRC_ANYRC=\"\${ANYRC_ROOT}/\${ANYRC_NAME}\"
+          export ANYRC_ANYRCD=\"\${ANYRC_ROOT}/\${ANYRCD_NAME}\"
+          export ANYRC_HOME=\"\${ANYRC_ANYRCD}\"
           export SHELL=\$(which \"${REMOTE_SHELL}\")
           export PATH=\"\${PATH}:\${ANYRC_ROOT}\"
           trap \"rm -rf \${ANYRC_ROOT}; exit\" 0
-          source \"\${ANYRC_DANYRC}\"
+          source \"\${ANYRC_ANYRC}\"
           if [ \"${REMOTE_SHELL##*/}\" = 'bash' ]; then
-            bash --rcfile \${ANYRC_DANYRC}
+            bash --rcfile \${ANYRC_ANYRC}
           else
             ${REMOTE_SHELL}
           fi" ;;

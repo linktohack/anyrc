@@ -106,11 +106,11 @@ transfer() {
       : ;;
     exec )
       # Transfer .anyrc
-      docker cp -L ${DOCKER_GLOBAL_OPTS} "${ANYRC_DANYRC}" "${DOCKER_CONTAINER}:${TMP_DIR}/${DANYRC_NAME}"
+      docker cp -L ${DOCKER_GLOBAL_OPTS} "${ANYRC_ANYRC}" "${DOCKER_CONTAINER}:${TMP_DIR}/${ANYRC_NAME}"
 
       if [ ! -z "${ANYRC_DOCKER_WO_TAR:+_}" ] || [ ! -z "${ANYRC_WO_TAR:+_}" ]; then
         # Transfer .anyrc.d
-        docker cp -L ${DOCKER_GLOBAL_OPTS} "${ANYRC_DANYRCD}" "${DOCKER_CONTAINER}:${TMP_DIR}/${DANYRCD_NAME}"
+        docker cp -L ${DOCKER_GLOBAL_OPTS} "${ANYRC_ANYRCD}" "${DOCKER_CONTAINER}:${TMP_DIR}/${ANYRCD_NAME}"
 
         # Transfer *rc
         local CMD_DIR="$(abs_dirname $0)"
@@ -121,7 +121,7 @@ transfer() {
         done
       else
         # Transfer .anyrc.d
-        tar cz -h -C "${DANYRCD_DIR}" "${DANYRCD_BASE}" \
+        tar cz -h -C "${ANYRCD_DIR}" "${ANYRCD_BASE}" \
         | docker exec -i ${DOCKER_GLOBAL_OPTS} ${DOCKER_CONTAINER} sh -c "tar xz -C ${TMP_DIR}"
 
         # Transfer *rc
@@ -144,39 +144,39 @@ connect() {
       local CMD_DIR="$(abs_dirname $0)"
       docker run ${DOCKER_GLOBAL_OPTS} ${DOCKER_RUN_OPTS} "${DOCKER_IMAGE}" \
         "${REMOTE_SHELL}" -c "
-          export DANYRC_NAME=\"${DANYRC_NAME}\"
-          export DANYRCD_NAME=\"${DANYRCD_NAME}\"
+          export ANYRC_NAME=\"${ANYRC_NAME}\"
+          export ANYRCD_NAME=\"${ANYRCD_NAME}\"
           export ANYRC_ROOT=\"\$(mktemp -d /tmp/anyrc.XXXXXX)\"
-          export ANYRC_DANYRC=\"\${ANYRC_ROOT}/\${DANYRC_NAME}\"
-          export ANYRC_DANYRCD=\"\${ANYRC_ROOT}/\${DANYRCD_NAME}\"
-          export ANYRC_HOME=\"\${ANYRC_DANYRCD}\"
+          export ANYRC_ANYRC=\"\${ANYRC_ROOT}/\${ANYRC_NAME}\"
+          export ANYRC_ANYRCD=\"\${ANYRC_ROOT}/\${ANYRCD_NAME}\"
+          export ANYRC_HOME=\"\${ANYRC_ANYRCD}\"
           export PATH=\"\${ANYRC_ROOT}:\${PATH}\"
           trap \"rm -rf \${ANYRC_ROOT}; exit\" 0
-          mkdir -p \${ANYRC_DANYRCD}
-          echo '$(cat "${ANYRC_DANYRC}" | base64)' | base64 -d > \${ANYRC_DANYRC}
+          mkdir -p \${ANYRC_ANYRCD}
+          echo '$(cat "${ANYRC_ANYRC}" | base64)' | base64 -d > \${ANYRC_ANYRC}
           echo '$(tar czf - -h -C ${CMD_DIR} ${ANYRC_CMD} ${ANYRC_CMDS[@]} | base64)' | base64 -d | tar mxzf - -C \${ANYRC_ROOT}
-          echo '$(tar czf - -h -C ${DANYRCD_DIR} ${DANYRCD_BASE} | base64)' | base64 -d | tar mxzf - -C \${ANYRC_ROOT}
-          source \"\${ANYRC_DANYRC}\"
+          echo '$(tar czf - -h -C ${ANYRCD_DIR} ${ANYRCD_BASE} | base64)' | base64 -d | tar mxzf - -C \${ANYRC_ROOT}
+          source \"\${ANYRC_ANYRC}\"
           if [ \"${REMOTE_SHELL##*/}\" = 'bash' ]; then
-            bash --rcfile \${ANYRC_DANYRC}
+            bash --rcfile \${ANYRC_ANYRC}
           else
             ${REMOTE_SHELL}
           fi" ;;
     exec )
       docker exec ${DOCKER_GLOBAL_OPTS} ${DOCKER_EXEC_OPTS} "${DOCKER_CONTAINER}" \
         "${REMOTE_SHELL}" -c "
-          export DANYRC_NAME=\"${DANYRC_NAME}\"
-          export DANYRCD_NAME=\"${DANYRCD_NAME}\"
+          export ANYRC_NAME=\"${ANYRC_NAME}\"
+          export ANYRCD_NAME=\"${ANYRCD_NAME}\"
           export ANYRC_ROOT=\"${TMP_DIR}\"
-          export ANYRC_DANYRC=\"\${ANYRC_ROOT}/\${DANYRC_NAME}\"
-          export ANYRC_DANYRCD=\"\${ANYRC_ROOT}/\${DANYRCD_NAME}\"
-          export ANYRC_HOME=\"\${ANYRC_DANYRCD}\"
+          export ANYRC_ANYRC=\"\${ANYRC_ROOT}/\${ANYRC_NAME}\"
+          export ANYRC_ANYRCD=\"\${ANYRC_ROOT}/\${ANYRCD_NAME}\"
+          export ANYRC_HOME=\"\${ANYRC_ANYRCD}\"
           export SHELL=\$(which \"${REMOTE_SHELL}\")
           export PATH=\"\${PATH}:\${ANYRC_ROOT}\"
           trap \"rm -rf \${ANYRC_ROOT}; exit\" 0
-          source \"\${ANYRC_DANYRC}\"
+          source \"\${ANYRC_ANYRC}\"
           if [ \"${REMOTE_SHELL##*/}\" = 'bash' ]; then
-            bash --rcfile \${ANYRC_DANYRC}
+            bash --rcfile \${ANYRC_ANYRC}
           else
             ${REMOTE_SHELL}
           fi" ;;

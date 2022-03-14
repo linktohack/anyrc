@@ -40,8 +40,8 @@ See [example](./example) as well.
 
 
 ### More options
-* `ANYRC_DANYRC`: Path to `.anyrc`. Default is in home dir or curr dir
-* `ANYRC_DANYRCD`: Path to `.anyrc.d`. Default is in home dir or curr dir
+* `ANYRC_ANYRC`: Path to `.anyrc`. Default is in home dir or curr dir
+* `ANYRC_ANYRCD`: Path to `.anyrc.d`. Default is in home dir or curr dir
 * `ANYRC_SSH_CMD`: `ssh` command, i.e., you can use `autossh` instead
 * `ANYRC_DOCKER_WO_TAR`: If set, will work w/o `tar` on `dockerrc`
 * `ANYRC_K8S_WO_TAR`: If set, will work w/o `tar` on `kubectlrc`
@@ -62,8 +62,8 @@ ANYRC_SSH_CMD=autossh sshrc user@host
 * `ANYRC_ENV`: Show remote environment (`ssh`/`su`/`docker`/`k8s`)
 * `ANYRC_ROOT`: Path to tmp dir including all anyrc-related files each connection
 * `ANYRC_HOME`: Path to dir for dotfiles
-* `ANYRC_DANYRC`: Path to `.anyrc`
-* `ANYRC_DANYRCD`: Path to `.anyrc.d`
+* `ANYRC_ANYRC`: Path to `.anyrc`
+* `ANYRC_ANYRCD`: Path to `.anyrc.d`
 
 ### Examples
 See [example](./example)

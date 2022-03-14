@@ -17,12 +17,12 @@ if [ -e "${HOME}/.anyrc" ]; then
   if [ ! -z "${FORCE:+_}" ]; then
     echo "Overriding ${HOME}/.anyrc"
   else
-    SKIP_DANYRC=1
+    SKIP_ANYRC=1
     echo "Skipping installing .anyrc (If you want to install default .anyrc, install again w/ FORCE=1)"
   fi
 fi
 
-if [ -z "${SKIP_DANYRC:+_}" ]; then
+if [ -z "${SKIP_ANYRC:+_}" ]; then
   echo "Installing ${HOME}/.anyrc ..."
   curl -sSL "${REPO}/raw/${VERSION}/example/.anyrc" \
     -o ~/.anyrc
